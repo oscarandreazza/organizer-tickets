@@ -1,0 +1,94 @@
+.profile {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #f8f8f8;
+    margin-top: 20px;
+    border-radius: 5px;
+    padding: 0.8em 1.5em;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.avatar-perfil {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    background-size: cover;
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.avatar-perfil img {
+    border-radius: 50%;
+    display: block;
+    width: 150px;
+    height: 150px;
+    filter: drop-shadow(1px 2px 4px #121212);
+    object-fit: cover;
+}
+
+.avatar-icon {
+    position: absolute;
+    top: 50%;
+    left: 38%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    color: white;
+    text-shadow: 0 0 3px black;
+}
+.profile label {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.profile input {
+    padding: 10px;
+    font-weight: 20px;
+    width: 350px;
+    height: 38px;
+    border: none;
+    background-color: #efefef;
+    margin: 15px 0px;
+}
+.profile #email {
+    cursor: not-allowed;
+}
+
+.options {
+    display: flex;
+}
+.options button {
+    border: none;
+    width: 120px;
+    height: 35px;
+    font-weight: 600;
+}
+
+.exit {
+    border-radius: 6px;
+    color: #181c2e;
+}
+
+.save {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #181c2e;
+    color: #fff;
+    border: 1px solid #eaeaec;
+    border-radius: 6px;
+    margin-right: 15px;
+}
+
+.avatar-icon {
+    cursor: pointer;
+}

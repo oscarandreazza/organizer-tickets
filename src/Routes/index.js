@@ -4,6 +4,8 @@ import Signin from "../pages/Signin";
 import Signup from "../pages/Signup";
 
 import Dashboard from "../pages/Dashboard";
+import Profile from "../pages/Profile";
+import Customers from "../pages/Customers";
 
 export default function Root() {
     return (
@@ -32,6 +34,24 @@ export default function Root() {
                 element={
                     <WrapperRouter isPrivate>
                         <Dashboard />
+                    </WrapperRouter>
+                }
+            />
+            <Route
+                exact
+                path="/profile"
+                element={
+                    <WrapperRouter isPrivate>
+                        <Profile />
+                    </WrapperRouter>
+                }
+            />
+            <Route
+                exact
+                path="customers"
+                element={
+                    <WrapperRouter isPrivate>
+                        <Customers />
                     </WrapperRouter>
                 }
             />

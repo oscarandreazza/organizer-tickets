@@ -1,17 +1,31 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../contexts/auth";
 import { Link } from "react-router-dom";
+import ReactLoading from "react-loading";
 
 import logo from "../../assets/logo.svg";
 import "../Signin/Signin.css";
 
 const Signup = () => {
+    const { state, action } = useContext(AuthContext);
+
+    const [nomeRegister, setNomeRegister] = useState("");
     const [emailRegister, setEmailRegister] = useState("");
     const [passwordRegister, setPasswordRegister] = useState("");
-    const [nomeRegister, setNomeRegister] = useState("");
+    const [alert, setAlert] = useState(false);
 
     function handleRegister() {
-        console.log(`Email: ${emailRegister}| Password: ${passwordRegister} | Nome: ${nomeRegister}`);
-        alert("ok");
+        if (!nomeRegister || !emailRegister || !passwordRegister) {
+            setAlert("Por favor, preencha todos os campos antes de continuar *");
+            return;
+        }
+
+        action.signUp(nomeRegister, emailRegister, passwordRegister);
+
+        setNomeRegister("");
+        setEmailRegister("");
+        setPasswordRegister("");
+        setAlert(false);
     }
 
     return (
@@ -32,15 +46,20 @@ const Signup = () => {
                                 value={emailRegister}
                                 onChange={e => setEmailRegister(e.target.value)}
                             />
+
                             <input
                                 type="password"
                                 placeholder="Senha"
                                 value={passwordRegister}
                                 onChange={e => setPasswordRegister(e.target.value)}
                             />
-
-                            <button onClick={handleRegister}>Cadastrar</button>
-                            <Link to="/">Já possuo uma conta!</Link>
+                            <p className="alert">{!alert ? "" : alert}</p>
+                            <button onClick={handleRegister}>
+                                {!state.loadingAuth ? "Cadastrar" : <ReactLoading type={"bars"} color={"#ffffff"} height={15} width={15} />}
+                            </button>
+                            <Link className="link" to="/">
+                                Já possuo uma conta!
+                            </Link>
                         </div>
                     </div>
                 </div>
