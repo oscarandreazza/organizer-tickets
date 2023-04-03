@@ -6,6 +6,8 @@ import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import Profile from "../pages/Profile";
 import Customers from "../pages/Customers";
+import CreateTicket from "../pages/CreateTicket";
+import UpdateTicket from "../pages/UpdateTicket";
 
 export default function Root() {
     return (
@@ -52,6 +54,24 @@ export default function Root() {
                 element={
                     <WrapperRouter isPrivate>
                         <Customers />
+                    </WrapperRouter>
+                }
+            />
+            <Route
+                exact
+                path="new-ticket"
+                element={
+                    <WrapperRouter isPrivate>
+                        <CreateTicket />
+                    </WrapperRouter>
+                }
+            />
+            <Route
+                exact
+                path="update-ticket"
+                element={
+                    <WrapperRouter isPrivate>
+                        <UpdateTicket />
                     </WrapperRouter>
                 }
             />

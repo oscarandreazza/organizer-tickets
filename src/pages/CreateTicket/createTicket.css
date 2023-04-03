@@ -1,0 +1,43 @@
+.status-tickets {
+    display: flex;
+    flex-direction: row;
+    align-items: fle;
+}
+.status-tickets span label {
+    font-size: 16px;
+}
+
+.status-tickets input {
+    border-radius: 8px;
+    margin-right: 7px;
+    margin-left: 7px;
+    height: 18px;
+    width: 18px;
+}
+
+.container select {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    width: 350px;
+    max-width: 100%;
+    height: 38px;
+    border: none;
+    background-color: #efefef;
+}
+.description {
+    background-color: #efefef;
+    border: none;
+    margin: 15px 0px;
+    width: 350px;
+    max-width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .status-tickets {
+        flex-direction: column;
+    }
+    .status-tickets label {
+        padding: 0;
+    }
+}

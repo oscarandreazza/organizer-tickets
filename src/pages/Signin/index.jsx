@@ -24,7 +24,7 @@ const Signin = () => {
 
     return (
         <div className="section">
-            <div className="container">
+            <div className="container-login">
                 <div className="login-box">
                     <div className="login-box-logo">
                         <img src={logo} alt="logo" />

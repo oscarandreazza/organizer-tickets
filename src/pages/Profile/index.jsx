@@ -106,7 +106,7 @@ const Profile = () => {
                 <Title name="Meu perfil">
                     <FiSettings size={22} />
                 </Title>
-                <div className="profile">
+                <div className="container">
                     <div className="avatar-perfil">
                         {avatar === null ? <img src={avatarDefault} /> : <img src={avatar} />}
                         <label htmlFor="image">

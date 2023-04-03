@@ -1,4 +1,4 @@
-.profile {
+.container {
     max-width: 100%;
     display: flex;
     flex-direction: column;
@@ -6,7 +6,7 @@
     background-color: #f8f8f8;
     margin-top: 20px;
     border-radius: 5px;
-    padding: 0.8em 1.5em;
+    padding: 2.5em 1.5em;
 }
 
 input[type="file"] {
@@ -45,12 +45,12 @@ input[type="file"] {
     color: white;
     text-shadow: 0 0 3px black;
 }
-.profile label {
-    font-size: 22px;
+.container label {
+    font-size: 18px;
     font-weight: 600;
 }
 
-.profile input {
+.container input {
     padding: 10px;
     font-weight: 20px;
     width: 350px;
@@ -59,7 +59,7 @@ input[type="file"] {
     background-color: #efefef;
     margin: 15px 0px;
 }
-.profile #email {
+.container #email {
     cursor: not-allowed;
 }
 
