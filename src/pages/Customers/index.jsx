@@ -73,6 +73,8 @@ const Customers = () => {
         try {
             const collectionRef = collection(db, "customer");
             const docRef = doc(collectionRef, details.id);
+            const newCustomers = customers.filter(item => item.id !== details.id);
+            setCustomers(newCustomers);
             await deleteDoc(docRef);
             toast.success("Cliente deletado com sucesso!");
             setShowModal(false);
