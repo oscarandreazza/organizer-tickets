@@ -144,7 +144,7 @@ const Dashboard = () => {
                                 return (
                                     <tr key={item.id}>
                                         <td data-label="Cliente">{item.customer}</td>
-                                        <td data-babel="Assunto">{item.subject}</td>
+                                        <td data-label="Assunto">{item.subject}</td>
                                         <td data-label="Status">
                                             <span
                                                 style={{

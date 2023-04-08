@@ -99,26 +99,24 @@ const Customers = () => {
                         onChange={e => setNameCustomer(e.target.value)}
                     />
 
-                    <div>
-                        <label htmlFor="document">CPF/CNPJ:</label>
-                        <InputMask
-                            mask={documentCustomer.length > 14 ? "99.999.999/9999-99" : "999.999.999-99"}
-                            id="document"
-                            placeholder="CPF OU CNPJ"
-                            value={documentCustomer}
-                            onChange={e => setDocumentCustomer(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="address">Endereço:</label>
-                        <input
-                            type="text"
-                            id="address"
-                            placeholder="Endreço completo"
-                            value={addressCustomer}
-                            onChange={e => setAddressCustomer(e.target.value)}
-                        />
-                    </div>
+                    <label htmlFor="document">CPF/CNPJ:</label>
+                    <InputMask
+                        mask={documentCustomer.length > 14 ? "99.999.999/9999-99" : "999.999.999-99"}
+                        id="document"
+                        placeholder="CPF OU CNPJ"
+                        value={documentCustomer}
+                        onChange={e => setDocumentCustomer(e.target.value)}
+                    />
+
+                    <label htmlFor="address">Endereço:</label>
+                    <input
+                        type="text"
+                        id="address"
+                        placeholder="Endreço completo"
+                        value={addressCustomer}
+                        onChange={e => setAddressCustomer(e.target.value)}
+                    />
+
                     <div className="options">
                         <button className="save" onClick={handleSaveCustomer}>
                             {!loading ? "Salvar" : <ReactLoading type={"bars"} color={"#ffffff"} height={15} width={15} />}
@@ -143,7 +141,7 @@ const Customers = () => {
                                 return (
                                     <tr key={index}>
                                         <td data-label="Cliente">{customer.name}</td>
-                                        <td data-babel="CPF/CNPJ">{customer.document}</td>
+                                        <td data-label="CPF/CNPJ">{customer.document}</td>
                                         <td data-label="Endereço">{customer.address}</td>
                                         <td data-label="#">
                                             <button

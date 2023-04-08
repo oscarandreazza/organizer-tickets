@@ -30,3 +30,11 @@
 table td {
     font-size: 15px;
 }
+
+@media screen and (max-width: 768px) {
+    .container-customers {
+        align-items: start;
+        flex-direction: column;
+        padding: 2.5em 1.5em;
+    }
+}
