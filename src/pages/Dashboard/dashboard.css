@@ -53,6 +53,8 @@ table {
     margin: 0;
     padding: 0;
     table-layout: fixed;
+    max-height: 900px;
+    overflow-y: scroll;
 }
 
 table caption {
@@ -91,12 +93,89 @@ table td .action {
 
 table td .action svg {
     vertical-align: middle;
+    color: #fff;
 }
 
 table td .status {
     padding: 3px;
     border-radius: 3px;
     color: #fff;
+}
+
+.more {
+    margin: 1em 0;
+    padding: 0.3em;
+    height: 35px;
+    border: 0;
+    border-radius: 5px;
+    background-color: #181c2e;
+    color: #fff;
+    font-size: 0.7em;
+}
+
+.delete-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.delete-modal h3 {
+    margin: 0.6em;
+}
+
+.buttons button {
+    text-align: center;
+    font-weight: 600;
+    border: 0;
+    border-radius: 6px;
+    height: 2.5em;
+    padding: 0.7em;
+    margin: 0.6em;
+}
+
+.delete-confirm {
+    background-color: #181c2e;
+    color: #fff;
+}
+
+.delete-cancel {
+    background-color: #dfdede;
+    color: #181c2e;
+}
+
+.details-modal {
+    width: 100%;
+    flex-direction: column;
+    display: flex;
+}
+.close {
+    display: flex;
+    justify-content: flex-end;
+}
+.row {
+    margin: 0.5em 0;
+}
+.row p {
+    font-size: 1.5em;
+    font-weight: 800;
+}
+.row span {
+    font-size: 0.8em;
+    font-weight: 200;
+    color: #383838;
+}
+.details-subject {
+    margin-right: 1.5em;
+}
+
+.details-box {
+    margin-top: 0.4em;
+    max-width: 100%;
+    border-radius: 3px;
+    padding: 1em;
+    height: 150px;
+    background-color: #f7f7f7;
 }
 
 @media screen and (max-width: 600px) {

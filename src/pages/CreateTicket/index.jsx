@@ -3,16 +3,21 @@ import { Link } from "react-router-dom";
 import { db } from "../../services/firabaseConnection";
 import { collection, setDoc, getDoc, getDocs, doc } from "firebase/firestore/lite";
 import { FiPlus } from "react-icons/fi";
+import { AuthContext } from "../../contexts/auth";
 import ReactLoading from "react-loading";
 import SideBar from "../../components/SideBar";
 import Title from "../../components/Title";
 import createTicket from "./createTicket.css";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CreateTicket = () => {
-    const [customer, setCustomer] = useState("");
-    const [customers, setCustomers] = useState([]);
+    const { state } = useContext(AuthContext);
 
+    const [customers, setCustomers] = useState([]);
+    const navigate = useNavigate();
+
+    const [customer, setCustomer] = useState("");
     const [subject, setSubject] = useState("Suporte");
     const [status, setStatus] = useState("Em aberto");
     const [description, setDescription] = useState("");
@@ -40,8 +45,8 @@ const CreateTicket = () => {
 
             if (list.length === 0) {
                 setCustomers([{ id: 1, name: "" }]);
-                return;
                 setLoading(false);
+                return;
             }
             setLoading(false);
         } catch (err) {
@@ -64,10 +69,35 @@ const CreateTicket = () => {
     }
 
     const createNewTicket = async () => {
+        setLoading(true);
         if (!customer || !subject || !status || !description) {
             toast.error("Preencha todos os campos!");
+            setLoading(false);
             return;
         }
+        try {
+            const collectionRef = collection(db, "tickets");
+            const docRef = doc(collectionRef);
+            await setDoc(docRef, {
+                subject: subject,
+                status: status,
+                customer: customers[customer].name,
+                description: description,
+                createdAt: new Date(),
+                idCustomer: customers[customer].id,
+                userId: state.user.uid
+            });
+            toast.success("Chamado criado com sucesso!");
+            setCustomer("");
+            setSubject("Suporte");
+            setStatus("Em aberto");
+            setDescription("");
+            navigate("/dashboard");
+        } catch (err) {
+            console.log(err);
+            toast.error("Falha ao criar chamado, tente novamente!");
+        }
+        setLoading(false);
     };
 
     return (
@@ -84,6 +114,9 @@ const CreateTicket = () => {
                         <input type="text" placeholder="Carregando clientes..." />
                     ) : (
                         <select value={customer} onChange={handleChangeCustomer}>
+                            <option value="" disabled>
+                                Selecione um cliente
+                            </option>
                             {customers.map((item, index) => {
                                 return (
                                     <option key={item.id} value={index}>

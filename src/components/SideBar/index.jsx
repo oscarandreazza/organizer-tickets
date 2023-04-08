@@ -9,16 +9,13 @@ import avatarDefault from "../../assets/avatar.png";
 const SideBar = () => {
     const { state, action } = useContext(AuthContext);
 
-    const [name, setName] = useState(state.user && state.user.name);
-    const [avatar, setAvatar] = useState(state.user && state.user.avatarUrl);
-
     return (
         <div className="sidebar">
             <div>
                 <div className="logo">
-                    {avatar === null ? <img src={avatarDefault} /> : <img src={avatar} />}
+                    {state.user.avatarUrl === null ? <img src={avatarDefault} /> : <img src={state.user.avatarUrl} />}
 
-                    {name ? <p className="name">{name}</p> : ""}
+                    {state.user.name ? <p className="name">{state.user.name}</p> : ""}
                 </div>
                 <div className="menu">
                     <Link className="menu-item" to="/dashboard">

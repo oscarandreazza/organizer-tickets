@@ -23,7 +23,6 @@ const Profile = () => {
     //states para armazenar novos inputs do perfil
     const [newAvatar, setNewAvatar] = useState(null);
 
-    console.log(name);
     async function handleUpload() {
         try {
             const currentUid = state.user.uid;
@@ -43,7 +42,7 @@ const Profile = () => {
                 avatarUrl: urlImage
             };
             state.setUser(data);
-            state.storageUser(data);
+            action.storageUser(data);
         } catch (err) {
             console.log(err);
         }
@@ -81,7 +80,7 @@ const Profile = () => {
                     name: name
                 };
                 state.setUser(data);
-                state.storageUser(data);
+                action.storageUser(data);
             }
 
             if (newAvatar !== null && name !== null) {
