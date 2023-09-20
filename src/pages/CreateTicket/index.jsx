@@ -1,15 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../services/firabaseConnection";
-import { collection, setDoc, getDoc, getDocs, doc } from "firebase/firestore/lite";
+import { collection, setDoc, getDocs, doc } from "firebase/firestore/lite";
 import { FiPlus } from "react-icons/fi";
 import { AuthContext } from "../../contexts/auth";
 import ReactLoading from "react-loading";
 import SideBar from "../../components/SideBar";
 import Title from "../../components/Title";
-import createTicket from "./createTicket.css";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
 const CreateTicket = () => {
     const { state } = useContext(AuthContext);
@@ -23,10 +21,44 @@ const CreateTicket = () => {
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [users, setUsers] = useState([]);
+    const [user, setUser] = useState("");
+
     useEffect(() => {
         setLoading(true);
         loadClientes();
+        loadUsers();
     }, []);
+
+    async function loadUsers() {
+        try {
+            const collectionRef = collection(db, "user");
+            const docRef = await getDocs(collectionRef);
+
+            const list = [];
+
+            docRef.forEach(doc => {
+                list.push({
+                    id: doc.id,
+                    name: doc.data().name,
+                    avatarUrl: doc.data().avatarUrl
+                });
+            });
+
+            setUsers(list);
+
+            if (list.length === 0) {
+                setCustomers([{ id: 1, name: "" }]);
+                setUsers(false);
+                return;
+            }
+            setLoading(false);
+        } catch (err) {
+            setUsers([{ id: 1, name: "" }]);
+            setLoading(false);
+            throw new Error(err);
+        }
+    }
 
     async function loadClientes() {
         try {
@@ -68,9 +100,13 @@ const CreateTicket = () => {
         setCustomer(e.target.value);
     }
 
+    function handleChangeUsers(e) {
+        setUser(e.target.value);
+    }
+
     const createNewTicket = async () => {
         setLoading(true);
-        if (!customer || !subject || !status || !description) {
+        if ((!user, !customer || !subject || !status || !description)) {
             toast.error("Preencha todos os campos!");
             setLoading(false);
             return;
@@ -79,6 +115,8 @@ const CreateTicket = () => {
             const collectionRef = collection(db, "tickets");
             const docRef = doc(collectionRef);
             await setDoc(docRef, {
+                owner: users[user].name,
+                ownerAvatar: users[user].avatarUrl,
                 subject: subject,
                 status: status,
                 customer: customers[customer].name,
@@ -108,6 +146,25 @@ const CreateTicket = () => {
                     <FiPlus size={22} />
                 </Title>
                 <div className="container">
+                    <label htmlFor="client">Responsavel:</label>
+
+                    {loading ? (
+                        <input type="text" placeholder="Carregando responsaveis..." />
+                    ) : (
+                        <select value={user} onChange={handleChangeUsers}>
+                            <option value="" disabled>
+                                Selecione um responsavel
+                            </option>
+                            {users.map((item, index) => {
+                                return (
+                                    <option key={item.id} value={index}>
+                                        {item.name}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    )}
+
                     <label htmlFor="client">Cliente:</label>
 
                     {loading ? (

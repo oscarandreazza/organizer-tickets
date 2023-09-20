@@ -1,17 +1,13 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { useState, useEffect, createContext } from "react";
-import { auth, db } from "../services/firabaseConnection";
-import { collection, getDocs, getDoc, setDoc, doc, addDoc, deleteDoc } from "firebase/firestore/lite";
+import { useState, useEffect, createContext, useMemo } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import verifyErroCode from "../utils/verifyErroCode";
+import axios from "axios";
 
 export const AuthContext = createContext({});
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loadingAuth, setLoadingAuth] = useState(false);
-    // const [snapUser, setSnapUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,7 +23,6 @@ function AuthProvider({ children }) {
     };
 
     const authActions = {
-        signIn,
         signUp,
         logout,
         storageUser
@@ -40,7 +35,6 @@ function AuthProvider({ children }) {
                 setUser(JSON.parse(storageUser));
             }
         } catch (error) {
-            console.log(error);
             setUser(null);
         }
 
@@ -49,65 +43,25 @@ function AuthProvider({ children }) {
 
     async function signUp(name, email, password) {
         setLoadingAuth(true);
+        const newUser = {
+            name: name,
+            email: email,
+            password: password,
+            device_name: navigator.userAgent
+        };
+
         try {
-            const createdUser = await createUserWithEmailAndPassword(auth, email, password);
-
-            const collectionRef = collection(db, "user");
-            const docRef = doc(collectionRef, createdUser.user.uid);
-            await setDoc(docRef, { name: name, avatarUrl: null });
-
-            let data = {
-                uid: createdUser.user.uid,
-                name: name,
-                email: createdUser.user.email,
-                avatarUrl: null
-            };
-
+            const user = await axios.post("http://localhost:8989/api/register", newUser);
+            const data = user.data;
+            toast.success("Conta criada com sucesso. Bem vindo!");
             setUser(data);
             storageUser(data);
             setLoadingAuth(false);
-            toast.success("Conta criada com sucesso. Bem vindo!");
         } catch (err) {
-            const errorCode = err.code;
-            let response = verifyErroCode(errorCode);
-            if (response == null) {
-                response = err.message;
-            }
             setLoadingAuth(false);
             setUser(null);
             storageUser(null);
-            setLoadingAuth(false);
-            toast.warn(response);
-        }
-    }
-
-    async function signIn(email, password) {
-        setLoadingAuth(true);
-        try {
-            const response = await signInWithEmailAndPassword(auth, email, password);
-            const docRef = doc(db, "user", response.user.uid);
-            let document = await getDoc(docRef);
-
-            let data = {
-                uid: response.user.uid,
-                name: document.data().name,
-                avatarUrl: document.data().avatarUrl,
-                email: response.user.email
-            };
-
-            setUser(data);
-            storageUser(data);
-            setLoadingAuth(false);
-            toast.success("Bem vindo!");
-        } catch (err) {
-            const errorCode = err.code;
-            let response = verifyErroCode(errorCode);
-
-            if (response == null) {
-                response = err.message;
-            }
-            toast.error(response);
-            setLoadingAuth(false);
+            toast.warn(err.response.data.message);
         }
     }
 
@@ -117,14 +71,18 @@ function AuthProvider({ children }) {
 
     async function logout() {
         try {
-            await auth.signOut();
             setUser(null);
             storageUser(null);
         } catch (err) {
             console.log(`Falha ao deslogar: ${err}`);
         }
     }
-    return <AuthContext.Provider value={{ state: authStates, action: authActions }}>{children}</AuthContext.Provider>;
+
+    return (
+        <AuthContext.Provider value={useMemo(() => ({ state: authStates, action: authActions }), [authStates, authActions])}>
+            {children}
+        </AuthContext.Provider>
+    );
 }
 
 export default AuthProvider;

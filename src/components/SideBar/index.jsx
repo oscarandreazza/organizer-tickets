@@ -1,6 +1,5 @@
-import logo from "../../assets/avatar.png";
 import { Link } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { FiHome, FiUsers, FiSettings, FiLogOut } from "react-icons/fi";
 import "./sideBar.css";
 import { AuthContext } from "../../contexts/auth";
@@ -8,14 +7,14 @@ import avatarDefault from "../../assets/avatar.png";
 
 const SideBar = () => {
     const { state, action } = useContext(AuthContext);
+    const avatar = state.user.avatarUrl ?? avatarDefault;
 
     return (
         <div className="sidebar">
             <div>
                 <div className="logo">
-                    {state.user.avatarUrl === null ? <img src={avatarDefault} /> : <img src={state.user.avatarUrl} />}
-
-                    {state.user.name ? <p className="name">{state.user.name}</p> : ""}
+                    <img src={avatar} alt="avatar-user" />
+                    {state.user.current_user ? <p className="name">{state.user.current_user}</p> : ""}
                 </div>
                 <div className="menu">
                     <Link className="menu-item" to="/dashboard">
@@ -32,7 +31,6 @@ const SideBar = () => {
                     </Link>
                     <Link className="menu-item" onClick={action.logout}>
                         <FiLogOut />
-
                         <span>Logout</span>
                     </Link>
                 </div>

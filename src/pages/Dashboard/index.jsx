@@ -9,11 +9,11 @@ import "./dashboard.css";
 import { db } from "../../services/firabaseConnection";
 import { collection, getDocs, doc, limit, orderBy, query, startAfter, deleteDoc } from "firebase/firestore/lite";
 import { FiHome, FiPlus, FiSearch, FiEdit2, FiTrash2, FiAlertTriangle, FiX } from "react-icons/fi";
+import avatarDefault from "../../assets/avatar.png";
 
 import { format } from "date-fns";
 
 const Dashboard = () => {
-    // const { state } = useContext(AuthContext);
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -51,6 +51,8 @@ const Dashboard = () => {
             snapshot.forEach(doc => {
                 list.push({
                     id: doc.id,
+                    owner: doc.data().owner,
+                    ownerAvatar: doc.data().ownerAvatar,
                     customer: doc.data().customer,
                     idCustomer: doc.data().idCustomer,
                     description: doc.data().description,
@@ -118,7 +120,7 @@ const Dashboard = () => {
             </div>
         );
     }
-
+    console.log(tickets);
     function showAllTickets() {
         return (
             <div className="newCall">
@@ -135,6 +137,7 @@ const Dashboard = () => {
                                 <th scope="col">Cliente</th>
                                 <th scope="col">Assunto</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Responsável</th>
                                 <th scope="col">Cadastro</th>
                                 <th scope="col">#</th>
                             </tr>
@@ -159,6 +162,16 @@ const Dashboard = () => {
                                             >
                                                 {item.status}
                                             </span>
+                                        </td>
+                                        <td data-label="Responsável">
+                                            <div className="owner">
+                                                <span>{item.owner}</span>
+                                                {item.ownerAvatar === null ? (
+                                                    <img className="avatarOwner" src={avatarDefault} alt="ownerPicture" />
+                                                ) : (
+                                                    <img className="avatarOwner" src={item.ownerAvatar} alt="ownerPicture" />
+                                                )}
+                                            </div>
                                         </td>
                                         <td data-label="Cadastro">{format(item.createdAt, "dd/MM/yyyy ")}</td>
                                         <td data-label="#">
@@ -189,7 +202,8 @@ const Dashboard = () => {
                     </table>
 
                     {loadingMore && <h3 style={{ textAlign: "center", marginTop: 15 }}>Carregando mais chamados...</h3>}
-                    {!isEmpty && (
+
+                    {tickets.length >= 5 && !isEmpty && (
                         <button className="more" onClick={handleMore}>
                             Ver mais
                         </button>

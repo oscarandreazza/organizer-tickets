@@ -12,12 +12,13 @@ import { db, storage } from "../../services/firabaseConnection";
 import { collection, doc, updateDoc } from "firebase/firestore/lite";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ReactLoading from "react-loading";
+import axios, * as others from "axios";
 
 const Profile = () => {
     const { state, action } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     //states vindos do contexto de user
-    const [name, setName] = useState(state.user && state.user.name);
+    const [name, setName] = useState(state.user && state.user.current_user);
     const [email, setEmail] = useState(state.user && state.user.email);
     const [avatar, setAvatar] = useState(state.user && state.user.avatarUrl);
     //states para armazenar novos inputs do perfil
@@ -25,24 +26,21 @@ const Profile = () => {
 
     async function handleUpload() {
         try {
-            const currentUid = state.user.uid;
-
-            const path = `images/${currentUid}/${newAvatar.name}`;
-            const refStorage = ref(storage, path);
-            const uploadTask = await uploadBytes(refStorage, newAvatar);
-            const urlImage = await getDownloadURL(uploadTask.ref);
-
-            const refCollection = collection(db, "user");
-            const docRef = doc(refCollection, state.user.uid);
-            await updateDoc(docRef, { name: name, avatarUrl: urlImage });
-
-            let data = {
-                ...state.user,
-                name: name,
-                avatarUrl: urlImage
-            };
-            state.setUser(data);
-            action.storageUser(data);
+            // const currentUid = state.user.uid;
+            // const path = `images/${currentUid}/${newAvatar.name}`;
+            // const refStorage = ref(storage, path);
+            // const uploadTask = await uploadBytes(refStorage, newAvatar);
+            // const urlImage = await getDownloadURL(uploadTask.ref);
+            // const refCollection = collection(db, "user");
+            // const docRef = doc(refCollection, state.user.uid);
+            // await updateDoc(docRef, { name: name, avatarUrl: urlImage });
+            // let data = {
+            //     ...state.user,
+            //     name: name,
+            //     avatarUrl: urlImage
+            // };
+            // state.setUser(data);
+            // action.storageUser(data);
         } catch (err) {
             console.log(err);
         }
@@ -64,37 +62,37 @@ const Profile = () => {
     }
 
     async function handleSave() {
-        if (!name) {
-            toast.warn("Name is required!");
-            return;
-        }
-        setLoading(true);
         try {
-            if (newAvatar === null && name !== "") {
-                const refCollection = collection(db, "user");
-                const docRef = doc(refCollection, state.user.uid);
-                await updateDoc(docRef, { name: name });
-
-                let data = {
-                    ...state.user,
-                    name: name
-                };
-                state.setUser(data);
-                action.storageUser(data);
+            setLoading(true);
+            if (!name) {
+                return toast.warn("Preencha o campo nome!");
             }
 
-            if (newAvatar !== null && name !== null) {
-                handleUpload();
-            }
-            setTimeout(() => {
-                setLoading(false);
-            }, 500);
+            const updatedUser = { ...state.user, current_user: name, image_url: newAvatar };
+            await updateUserProfile(updatedUser);
 
-            toast.success("Perfil atualizado com sucesso!");
-        } catch (err) {
-            console.log(err);
+            state.setUser(updatedUser);
+            action.storageUser(updatedUser);
+
             setLoading(false);
-            toast.warn("Falha ao atualizar perfil!");
+            toast.success("Perfil atualizado com sucesso!");
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+            toast.error("Falha ao atualizar perfil!");
+        }
+    }
+
+    async function updateUserProfile(user) {
+        try {
+            const response = await axios.patch(
+                `http://localhost:8989/api/user/update/${user.user_id}`,
+                { current_user: user.current_user, image_url: user.image_url },
+                { headers: { Authorization: `Bearer ${user.access_token}` } }
+            );
+            return response.data;
+        } catch (error) {
+            throw error;
         }
     }
 

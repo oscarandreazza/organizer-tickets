@@ -177,6 +177,21 @@ table td .status {
     height: 150px;
     background-color: #f7f7f7;
 }
+.owner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.owner span {
+    margin-right: 7px;
+}
+.avatarOwner {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    filter: drop-shadow(1px 1px 3px #121212);
+    object-fit: cover;
+}
 
 @media screen and (max-width: 600px) {
     table {

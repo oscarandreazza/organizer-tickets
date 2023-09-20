@@ -164,7 +164,7 @@ const Customers = () => {
                     <Modal showModal={setShowModal} heigth={200} width={300}>
                         <div className="delete-modal">
                             <FiAlertTriangle size={45} color="#E02041" />
-                            <h3>Tem certeza que deseja excluir esse chamado?</h3>
+                            <h3>Tem certeza que deseja excluir esse cliente?</h3>
                             <div className="buttons">
                                 <button className="delete-confirm" onClick={handleDelete}>
                                     Confirmar
