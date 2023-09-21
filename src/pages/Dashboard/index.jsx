@@ -6,82 +6,40 @@ import Title from "../../components/Title";
 import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
 import "./dashboard.css";
-import { db } from "../../services/firabaseConnection";
-import { collection, getDocs, doc, limit, orderBy, query, startAfter, deleteDoc } from "firebase/firestore/lite";
 import { FiHome, FiPlus, FiSearch, FiEdit2, FiTrash2, FiAlertTriangle, FiX } from "react-icons/fi";
 import avatarDefault from "../../assets/avatar.png";
-
+import axios from "axios";
 import { format } from "date-fns";
+
+const API_URL = "http://localhost:8989";
 
 const Dashboard = () => {
     const [tickets, setTickets] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [isEmpty, setIsEmpty] = useState(false);
-    const [lastDocs, setLastDocs] = useState();
 
     const [showModalDetails, setShowModalDetails] = useState(false);
     const [showModalDelete, setShowModalDelete] = useState(false);
     const [details, setDetails] = useState({});
+    const { state } = useContext(AuthContext);
 
     useEffect(() => {
         loadingTickets();
-    }, []);
+    }, [state.user]);
 
-    async function loadingTickets() {
+    async function loadingTickets(id = state.user.user_id, access_token = state.user.access_token) {
+        setLoading(true);
         try {
-            let collectionRef = collection(db, "tickets");
-            const querySnapshot = query(collectionRef, orderBy("createdAt", "desc"), limit(5));
-            const docsRefs = await getDocs(querySnapshot);
-            updatestate(docsRefs);
-
+            let data = await axios.get(`${API_URL}/api/ticket?user_id=${id}`, {
+                headers: {
+                    Authorization: `Bearer ${access_token}`
+                }
+            });
+            setTickets(data.data.data);
             setLoading(false);
         } catch (err) {
             console.log(err);
             setLoading(false);
-        }
-        setLoading(false);
-    }
-
-    async function updatestate(snapshot) {
-        const isCollectionEmpty = snapshot.size === 0;
-
-        if (!isCollectionEmpty) {
-            let list = [];
-            snapshot.forEach(doc => {
-                list.push({
-                    id: doc.id,
-                    owner: doc.data().owner,
-                    ownerAvatar: doc.data().ownerAvatar,
-                    customer: doc.data().customer,
-                    idCustomer: doc.data().idCustomer,
-                    description: doc.data().description,
-                    status: doc.data().status,
-                    subject: doc.data().subject,
-                    createdAt: doc.data().createdAt.toDate()
-                });
-            });
-            const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-            setTickets(tickets => [...tickets, ...list]);
-            setLastDocs(lastDoc);
-        } else {
-            setIsEmpty(true);
-        }
-        setLoadingMore(false);
-    }
-
-    async function handleMore() {
-        try {
-            let collectionRef = collection(db, "tickets");
-            const querySnapshot = query(collectionRef, orderBy("createdAt", "desc"), startAfter(lastDocs), limit(5));
-            const docsRefs = await getDocs(querySnapshot);
-            docsRefs.forEach(doc => {
-                console.log(doc.data());
-            });
-
-            updatestate(docsRefs);
-        } catch (err) {
-            console.log(err);
         }
     }
 
@@ -95,17 +53,18 @@ const Dashboard = () => {
         setDetails(item);
     }
 
-    async function handleDelete() {
+    async function handleDelete(id, access_token = state.user.access_token) {
         try {
-            let collectionRef = collection(db, "tickets");
-            deleteDoc(doc(collectionRef, details.id));
-            const newTickets = tickets.filter(item => item.id !== details.id);
-            setTickets(newTickets);
+            await axios.delete(`${API_URL}/api/ticket/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${access_token}`
+                }
+            });
             toast.success("Chamado deletado com sucesso!");
-            setShowModalDelete(!showModalDelete);
         } catch (err) {
-            console.log(err);
-            toast.success("Erro ao deletar chamado!");
+            toast.error("Falha ao deletar chamado!");
+        } finally {
+            setShowModalDelete(false);
         }
     }
 
@@ -120,7 +79,6 @@ const Dashboard = () => {
             </div>
         );
     }
-    console.log(tickets);
     function showAllTickets() {
         return (
             <div className="newCall">
@@ -137,7 +95,6 @@ const Dashboard = () => {
                                 <th scope="col">Cliente</th>
                                 <th scope="col">Assunto</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Responsável</th>
                                 <th scope="col">Cadastro</th>
                                 <th scope="col">#</th>
                             </tr>
@@ -146,15 +103,15 @@ const Dashboard = () => {
                             {tickets.map((item, index) => {
                                 return (
                                     <tr key={item.id}>
-                                        <td data-label="Cliente">{item.customer}</td>
+                                        <td data-label="Cliente">{item.customer_name}</td>
                                         <td data-label="Assunto">{item.subject}</td>
                                         <td data-label="Status">
                                             <span
                                                 style={{
                                                     backgroundColor:
-                                                        item.status === "Resolvido"
+                                                        item.status === "resolved"
                                                             ? "#5CB85C"
-                                                            : item.status === "Em andamento"
+                                                            : item.status === "inProgress"
                                                             ? "#F0AD4E"
                                                             : "#999"
                                                 }}
@@ -163,17 +120,7 @@ const Dashboard = () => {
                                                 {item.status}
                                             </span>
                                         </td>
-                                        <td data-label="Responsável">
-                                            <div className="owner">
-                                                <span>{item.owner}</span>
-                                                {item.ownerAvatar === null ? (
-                                                    <img className="avatarOwner" src={avatarDefault} alt="ownerPicture" />
-                                                ) : (
-                                                    <img className="avatarOwner" src={item.ownerAvatar} alt="ownerPicture" />
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td data-label="Cadastro">{format(item.createdAt, "dd/MM/yyyy ")}</td>
+                                        <td data-label="Cadastro">{format(new Date(item.created_at), "dd/MM/yyyy HH:mm:ss")}</td>
                                         <td data-label="#">
                                             <button
                                                 className="action"
@@ -200,14 +147,6 @@ const Dashboard = () => {
                             })}
                         </tbody>
                     </table>
-
-                    {loadingMore && <h3 style={{ textAlign: "center", marginTop: 15 }}>Carregando mais chamados...</h3>}
-
-                    {tickets.length >= 5 && !isEmpty && (
-                        <button className="more" onClick={handleMore}>
-                            Ver mais
-                        </button>
-                    )}
                 </div>
             </div>
         );
@@ -243,13 +182,13 @@ const Dashboard = () => {
                             </div>
                             <div className="row">
                                 <p>
-                                    Cliente: <span> {details.customer}</span>
+                                    Cliente: <span> {details.customer_name}</span>
                                 </p>
                             </div>
                             <div className="row">
                                 <p>
                                     Assunto: <span className="details-subject">{details.subject}</span> Cadastrado em:{" "}
-                                    <span>{format(details.createdAt, "dd/MM/yyyy HH:mm")}</span>
+                                    <span>{format(new Date(details.created_at), "dd/MM/yyyy HH:mm:ss")}</span>
                                 </p>
                             </div>
 
@@ -263,9 +202,9 @@ const Dashboard = () => {
                                             borderRadius: 6,
                                             color: "#FFF",
                                             backgroundColor:
-                                                details.status === "Resolvido"
+                                                details.status === "resolved"
                                                     ? "#5CB85C"
-                                                    : details.status === "Em andamento"
+                                                    : details.status === "inProgress"
                                                     ? "#F0AD4E"
                                                     : "#999"
                                         }}
@@ -276,7 +215,7 @@ const Dashboard = () => {
                             </div>
                             <div className="row">
                                 <p>Detalhes:</p>
-                                <div className="details-box"> {details.description}</div>
+                                <div className="details-box"> {details.details}</div>
                             </div>
                         </div>
                     </Modal>
@@ -287,7 +226,7 @@ const Dashboard = () => {
                             <FiAlertTriangle size={45} color="#E02041" />
                             <h3>Tem certeza que deseja excluir esse chamado?</h3>
                             <div className="buttons">
-                                <button className="delete-confirm" onClick={handleDelete}>
+                                <button className="delete-confirm" onClick={() => handleDelete(details.id)}>
                                     Confirmar
                                 </button>
                                 <button className="delete-cancel" onClick={() => setShowModalDelete(false)}>
